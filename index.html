@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>justedone — проекты</title>
-    <!-- Новое, стабильное подключение иконок -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Подключаем официальные иконки FontAwesome, чтобы они отображались корректно -->
+    <link rel="stylesheet" href="https://cloudflare.com">
     <style>
         :root {
             --bg-color: #0b0c10;
@@ -34,6 +34,7 @@
             100% { transform: translateY(105vh) rotate(360deg); opacity: 0; }
         }
 
+        /* Супер-плавное переливание от белого к нежно-голубому */
         @keyframes softGradient {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
@@ -96,33 +97,6 @@
             z-index: 2;
         }
 
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            margin-bottom: 20px;
-        }
-
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-            background-color: #747d8c; 
-            transition: background-color 0.5s ease, box-shadow 0.5s ease;
-        }
-
-        .status-dot.online { background-color: #2ecc71; box-shadow: 0 0 8px #2ecc71; }
-        .status-dot.idle { background-color: #f1c40f; box-shadow: 0 0 8px #f1c40f; }
-        .status-dot.dnd { background-color: #e74c3c; box-shadow: 0 0 8px #e74c3c; }
-        .status-dot.offline { background-color: #747d8c; box-shadow: none; }
-
         h1 {
             font-size: 1.5rem;
             font-weight: 500;
@@ -131,6 +105,7 @@
             color: var(--text-main);
         }
 
+        /* Мягкий бело-голубой градиент */
         h1 strong {
             font-weight: 700;
             background: linear-gradient(270deg, #ffffff, #e3f2fd, #b3e5fc, #ffffff);
@@ -236,11 +211,6 @@
     <div id="snow-container"></div>
 
     <div class="container">
-        <div class="status-badge">
-            <div class="status-dot" id="statusDot"></div>
-            <span id="statusText">Подключение к Discord...</span>
-        </div>
-
         <h1 id="mainTitle">Проекты разработчика <strong>justedone</strong></h1>
         
         <p class="description">
@@ -280,8 +250,9 @@
             </a>
         </div>
     </div>
-     <script>
-        // Снегопад
+
+    <script>
+        // Генерация снегопада
         const snowContainer = document.getElementById('snow-container');
         const count = 40;
         const flakes = ['❄', '•', '✧'];
@@ -296,49 +267,6 @@
             flake.style.fontSize = Math.random() * 0.6 + 0.6 + 'rem';
             snowContainer.appendChild(flake);
         }
-
-        // Интеграция с Discord через Lanyard API
-        const DISCORD_ID = "1336357457731256425"; 
-
-        const dot = document.getElementById('statusDot');
-        const text = document.getElementById('statusText');
-
-        async function fetchDiscordStatus() {
-            try {
-                const response = await fetch(`https://api.lanyard.rest/v1/users/${DISCORD_ID}`);
-                
-                // Если API возвращает ошибку 404 (аккаунт ещё не прогрузился в базе Lanyard)
-                if (!response.ok) {
-                    text.innerText = "Оффлайн / Статус скрыт";
-                    dot.className = "status-dot offline";
-                    return;
-                }
-
-                const resData = await response.json();
-                
-                if (resData.success && resData.data) {
-                    const status = resData.data.discord_status; // online, idle, dnd, offline
-                    
-                    dot.className = `status-dot ${status}`;
-                    
-                    if (status === "online") text.innerText = "В сети / Кожу проекты";
-                    else if (status === "idle") text.innerText = "Отошел / AFK";
-                    else if (status === "dnd") text.innerText = "Не беспокоить / Тестирую софт";
-                    else text.innerText = "Не в сети";
-                } else {
-                    text.innerText = "Не в сети";
-                    dot.className = "status-dot offline";
-                }
-            } catch (error) {
-                // Если нет интернета или упал сервер API, сайт не ломается
-                text.innerText = "Не в сети";
-                dot.className = "status-dot offline";
-            }
-        }
-
-        // Запуск мониторинга статуса
-        fetchDiscordStatus();
-        setInterval(fetchDiscordStatus, 15000); // Обновление каждые 15 секунд
     </script>
 </body>
 </html>
