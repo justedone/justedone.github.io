@@ -7,22 +7,29 @@
     <style>
         :root {
             --bg-color: #0b0c10;
-            --card-bg: rgba(22, 26, 35, 0.6);
-            --border-color: rgba(102, 252, 241, 0.2);
+            --card-bg: rgba(22, 26, 35, 0.65);
+            --border-color: rgba(102, 252, 241, 0.15);
             --accent-color: #66fcf1;
             --text-main: #f5f5f7;
             --text-muted: #c5c6c7;
         }
 
         @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); opacity: 0.5; }
+            50% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.5; }
+        }
+
+        @keyframes fall {
+            0% { transform: translateY(-10px) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.7; }
+            90% { opacity: 0.7; }
+            100% { transform: translateY(105vh) rotate(360deg); opacity: 0; }
         }
 
         * {
@@ -30,6 +37,7 @@
             margin: 0;
             padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            user-select: none;
         }
 
         body {
@@ -41,31 +49,85 @@
             justify-content: center;
             align-items: center;
             padding: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #snow-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .snowflake {
+            position: absolute;
+            color: #fff;
+            font-size: 1.2rem;
+            line-height: 1;
+            opacity: 0;
+            animation: fall linear infinite;
         }
 
         .container {
             max-width: 600px;
             width: 100%;
             background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             border: 1px solid var(--border-color);
             border-radius: 16px;
             padding: 35px 25px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
             text-align: center;
-            
-            /* Анимация появления всей карточки */
             animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            position: relative;
+            z-index: 2;
         }
 
-        /* Более компактный заголовок */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .status-badge:hover {
+            background: rgba(255, 255, 255, 0.07);
+            border-color: rgba(102, 252, 241, 0.3);
+            color: var(--text-main);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+
+        .status-dot.online { background-color: #2ecc71; box-shadow: 0 0 8px #2ecc71; }
+        .status-dot.coding { background-color: #3498db; box-shadow: 0 0 8px #3498db; }
+        .status-dot.away { background-color: #f1c40f; box-shadow: 0 0 8px #f1c40f; }
+
         h1 {
             font-size: 1.5rem;
             font-weight: 500;
             margin-bottom: 12px;
             letter-spacing: -0.3px;
             color: var(--text-main);
+            cursor: pointer;
         }
 
         h1 strong {
@@ -73,6 +135,15 @@
             background: linear-gradient(90deg, #fff, var(--accent-color));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            transition: background 0.5s ease;
+        }
+
+        h1.rainbow strong {
+            background: linear-gradient(90deg, #ff007f, #7f00ff, #00f3ff, #ff007f);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: pulse 1s infinite alternate;
         }
 
         .description {
@@ -94,26 +165,28 @@
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: 10px;
-            padding: 12px 18px;
-            transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+            padding: 14px 18px;
+            transition: all 0.25s ease;
         }
 
         .project-item:hover {
-            transform: translateX(4px);
-            border-color: rgba(102, 252, 241, 0.3);
-            background: rgba(255, 255, 255, 0.04);
+            transform: translateY(-2px);
+            border-color: rgba(102, 252, 241, 0.4);
+            background: rgba(102, 252, 241, 0.02);
+            box-shadow: 0 4px 20px rgba(102, 252, 241, 0.1);
         }
 
         .project-title {
             font-weight: 600;
             font-size: 0.95rem;
             color: var(--accent-color);
-            margin-bottom: 2px;
+            margin-bottom: 3px;
         }
 
         .project-text {
             color: var(--text-muted);
             font-size: 0.85rem;
+            line-height: 1.4;
         }
 
         .links-title {
@@ -134,6 +207,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            gap: 8px;
             padding: 12px 15px;
             background: rgba(255, 255, 255, 0.04);
             border: 1px solid rgba(255, 255, 255, 0.08);
@@ -145,29 +219,38 @@
             transition: all 0.2s ease;
         }
 
+        .btn svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+
         .btn:hover {
             background: var(--accent-color);
             color: #0b0c10;
             border-color: var(--accent-color);
-            box-shadow: 0 0 15px rgba(102, 252, 241, 0.3);
+            box-shadow: 0 0 15px rgba(102, 252, 241, 0.35);
             transform: translateY(-2px);
         }
 
         @media (max-width: 480px) {
-            .container {
-                padding: 25px 15px;
-            }
-            .buttons-container {
-                grid-template-columns: 1fr;
-            }
+            .container { padding: 25px 15px; }
+            .buttons-container { grid-template-columns: 1fr; }
         }
     </style>
 </head>
+
 <body>
 
+    <div id="snow-container"></div>
+
     <div class="container">
-        <!-- Уменьшенный заголовок с измененным текстом -->
-        <h1>Проекты разработчика <strong>justedone</strong></h1>
+        <div class="status-badge" id="statusBadge">
+            <div class="status-dot online" id="statusDot"></div>
+            <span id="statusText">В сети / Разрабатываю на ESP32</span>
+        </div>
+
+        <h1 id="mainTitle">Проекты разработчика <strong>justedone</strong></h1>
         
         <p class="description">
             Скрытный чит-клиент GhostClient, кастомные прошивки для T-Embed и DIY-сборки на базе микроконтроллеров ESP32.
@@ -195,11 +278,71 @@
         <div class="links-title">Ссылки</div>
         
         <div class="buttons-container">
-            <a href="https://github.com" target="_blank" class="btn">GitHub</a>
-            <a href="https://vk.ru" target="_blank" class="btn">ВКонтакте</a>
-            <a href="https://tiktok.com" target="_blank" class="btn">TikTok</a>
+            <a href="https://github.com" target="_blank" class="btn">
+                <svg viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                GitHub
+            </a>
+            <a href="https://vk.ru" target="_blank" class="btn">
+                <svg viewBox="0 0 24 24"><path d="M15.002 24c-11.135 0-15.002-7.561-15.002-15.002 0-2.261.478-4.394 1.337-6.303.497-1.102 1.232-1.928 2.302-2.327 1.018-.38 2.128-.368 3.398-.368h1.229c.677 0 1.14.168 1.442.548.337.423.415 1.042.229 1.932-.42 2.015-1.044 4.02-1.745 5.927-.271.737-.101 1.111.603 1.111h1.564c1.656 0 2.923-.553 3.656-1.542.926-1.251 1.624-3.188 2.032-5.467.142-.793.428-1.261.942-1.48.514-.219 1.189-.229 2.115-.229h2.348c1.333 0 2.355.035 3.013.435.753.458.917 1.261.503 2.502-.857 2.569-2.585 5.75-4.215 7.643-1.031 1.201-2.119 2.08-3.415 2.547-.698.251-1.015.111-1.341-.261-.531-.606-1.365-1.716-1.954-2.434-.41-.502-.793-.604-1.102-.303-.737.717-1.756 1.848-2.321 2.551-.482.604-.972.766-1.754.766h-1.341c-.482 0-.847-.035-1.157-.142-.321-.11-.531-.303-.664-.604-.153-.348-.109-.844.175-1.52.553-1.319 1.542-3.136 2.457-4.482.435-.641.916-1.144 1.34-1.144.258 0 .502.082.723.251.526.402.946 1.006 1.251 1.674.251.549.497.525.753-.021.579-1.246 1.147-2.732 1.542-4.145.249-.893-.162-1.345-1.145-1.345h-1.542c-.525 0-.905.109-1.145.348-.255.253-.399.646-.531 1.178-.519 2.088-1.353 4.225-2.35 5.922-.44.75-.929 1.134-1.391 1.134-.337 0-.613-.197-.791-.564-.261-.54-.372-1.328-.372-2.593 0-3.178.681-5.183 1.954-6.309.61-.54 1.347-.793 2.278-.793h1.229c.677 0 1.008.311 1.008.932v4.86c0 .546.216.793.633.793.38 0 .74-.194 1.066-.564 1.411-1.614 2.417-3.92 2.871-6.495.111-.635.438-.932 1.011-.932h2.348c.676 0 1.037.284 1.037.893 0 .42-.081.932-.258 1.48-.847 2.613-2.502 5.568-3.931 7.214-.905 1.04-1.745 1.706-2.518 1.983-.435.153-.787.054-1.04-.271-.468-.606-1.164-1.523-1.696-2.18-.328-.403-.646-.484-.89-.22-.656.713-1.503 1.716-1.996 2.316-.399.493-.782.63-1.33.63h-1.341z"/></svg>
+                ВКонтакте
+            </a>
+            <a href="https://tiktok.com" target="_blank" class="btn">
+                <svg viewBox="0 0 24 24"><path d="M12.525.02c1.312.015 2.613.208 3.864.577.073.498.245.975.508 1.404a6.49 6.49 0 0 0 2.261 2.347c.504.303 1.062.5 1.637.58v4.062c-1.144-.01-2.273-.25-3.32-.705a8.775 8.775 0 0 1-2.883-2.023v7.712c0 1.348-.316 2.673-.925 3.865a7.994 7.994 0 0 1-5.385 4.39 8.24 8.24 0 0 1-5.65-.678A8.09 8.09 0 0 1 .45 16.593a8.384 8.384 0 0 1-.365-5.626 8.163 8.163 0 0 1 3.551-5.26 8.016 8.016 0 0 1 5.37-.935V8.41a4.218 4.218 0 0 0-3.38 1.258 4.35 4.35 0 0 0-1.054 3.328 4.264 4.264 0 0 0 2.266 3.197 4.108 4.108 0 0 0 4.24-.265 4.293 4.293 0 0 0 1.83-3.411V0h3.647z"/></svg>
+                TikTok
+            </a>
         </div>
     </div>
 
+
+    <script>
+        const snowContainer = document.getElementById('snow-container');
+        const count = 40;
+        const flakes = ['❄', '•', '✧'];
+
+        for (let i = 0; i < count; i++) {
+            const flake = document.createElement('div');
+            flake.className = 'snowflake';
+            flake.innerText = flakes[Math.floor(Math.random() * flakes.length)];
+            
+            flake.style.left = Math.random() * 100 + 'vw';
+            flake.style.animationDuration = Math.random() * 5 + 5 + 's';
+            flake.style.animationDelay = Math.random() * 5 + 's';
+            flake.style.fontSize = Math.random() * 0.6 + 0.6 + 'rem';
+            
+            snowContainer.appendChild(flake);
+        }
+
+        const statuses = [
+            { text: "В сети / Разрабатываю на ESP32", class: "online" },
+            { text: "Пишу код / GhostClient", class: "coding" },
+            { text: "Отошёл / Тестирую девайсы", class: "away" }
+        ];
+        let currentStatusIndex = 0;
+
+        const badge = document.getElementById('statusBadge');
+        const dot = document.getElementById('statusDot');
+        const text = document.getElementById('statusText');
+
+        badge.addEventListener('click', () => {
+            currentStatusIndex = (currentStatusIndex + 1) % statuses.length;
+            const current = statuses[currentStatusIndex];
+            
+            dot.className = "status-dot " + current.class;
+            text.innerText = current.text;
+        });
+
+        let clickCount = 0;
+        const mainTitle = document.getElementById('mainTitle');
+        
+        mainTitle.addEventListener('click', () => {
+            clickCount++;
+            if (clickCount % 5 === 0) {
+                mainTitle.classList.add('rainbow');
+                setTimeout(() => {
+                    mainTitle.classList.remove('rainbow');
+                }, 3000);
+            }
+        });
+    </script>
 </body>
 </html>
